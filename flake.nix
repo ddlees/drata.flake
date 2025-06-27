@@ -40,7 +40,7 @@
             asar extract opt/Drata\ Agent/resources/app.asar app
             rm opt/Drata\ Agent/resources/app.asar
             substituteInPlace app/dist/main.js \
-              --replace-fail "process.resourcesPath" "'$out/share/drata-agent/resources'"
+              --replace-fail "process.resourcesPath" "'$out/opt/Drata\ Agent/resources'"
             asar pack app opt/Drata\ Agent/resources/app.asar
             rm -rf app
           '';
@@ -48,46 +48,19 @@
           installPhase = ''
             runHook preInstall
 
-            mkdir -p $out/share/drata-agent
-            cp -r usr/share $out/
-            cp -r opt/Drata\ Agent/resources/* $out/share/drata-agent/
-
+            mkdir -p "$out/bin"
+            cp -R opt "$out"
+            cp -R usr/share "$out/share"
+            
             runHook postInstall
           '';
 
           preFixup = lib.optionalString stdenv.hostPlatform.isLinux ''
             makeWrapper ${lib.getExe electron} $out/bin/drata-agent \
-              --add-flags $out/share/drata-agent/app.asar \
+              --add-flags "$out/opt/Drata\ Agent/resources/app.asar" \
               --add-flags "\''${NIXOS_OZONE_WL:+\''${WAYLAND_DISPLAY:+--ozone-platform-hint=auto --enable-features=WaylandWindowDecorations --enable-wayland-ime=true}}" \
               --inherit-argv0
           '';
-
-          # installPhase = ''
-          #   runHook preInstall
-          #
-          #   mkdir -p $out/{bin,lib/drata-agent,share/applications/share/icons/hicolor}
-          #
-          #   cp -r opt/Drata\ Agent/resources/app.asar $out/lib/drata-agent/
-          #
-          #   mkdir -p $out/lib/drata-agent/lib/linux/bin
-          #   cp opt/Drata\ Agent/resources/lib/linux/bin/osqueryi $out/lib/drata-agent/lib/linux/bin/
-          #
-          #   cp usr/share/applications/drata-agent.desktop $out/share/applications/
-          #   substituteInPlace $out/share/applications/drata-agent.desktop \
-          #     --replace-fail 'Exec="/opt/Drata Agent/drata-agent" %U' "Exec=\"$out/bin/drata-agent\" %U"
-          #
-          #   for size in 16 32 256 512; do
-          #     mkdir -p $out/share/icons/hicolor/''${size}x''${size}/apps
-          #     cp usr/share/icons/hicolor/''${size}x''${size}/apps/drata-agent.png \
-          #       $out/share/icons/hicolor/''${size}x''${size}/apps/drata-agent.png
-          #   done
-          #
-          #   makeWrapper ${electron}/bin/electron $out/bin/drata-agent \
-          #     --add-flags "$out/lib/drata-agent/app.asar"
-          #
-          #   runHook postInstall
-          # '';
-
 
           meta = with pkgs.lib; {
             description = "Lightweight tray application for compliance tracking";
