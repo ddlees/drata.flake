@@ -49,7 +49,7 @@
             asar extract opt/Drata\ Agent/resources/app.asar app
             rm opt/Drata\ Agent/resources/app.asar
             substituteInPlace app/dist/main.js \
-              --replace-fail "process.resourcesPath" "'$out/lib/drata-agent'"
+              --replace-fail "process.resourcesPath" "'$out/share/drata-agent/resources'"
             asar pack app opt/Drata\ Agent/resources/app.asar
             rm -rf app
           '';
@@ -58,8 +58,6 @@
             runHook preInstall
 
             mkdir -p $out/share/drata-agent
-            ls -al opt/*
-            ls -al usr/*
             cp -r usr/share $out/
             cp -r opt/Drata\ Agent/resources/* $out/share/drata-agent/
 
