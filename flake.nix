@@ -33,15 +33,6 @@
           ];
 
           buildInputs = [
-            gtk3
-            libnotify
-            nss
-            xorg.libXScrnSaver
-            xorg.libXtst
-            xdg-utils
-            at-spi2-core
-            libuuid
-            libsecret
             libappindicator-gtk3 # systray support
           ];
 
